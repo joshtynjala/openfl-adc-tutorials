@@ -1,7 +1,5 @@
 {
-	"authors": [
-		{
-			"img": "../img/openfl-logo.png"
-		}
-	]
+	"author": {
+		"img": "../img/openfl-logo.png"
+	}
 }
