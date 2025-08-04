@@ -1,0 +1,29 @@
+{
+	"description": "Learn about different types of shadrs and how to write native programs for the GPU that control rendering of Stage3D content.",
+	"authors": [
+		{
+			"name": "Marco Scabia",
+			"prefix": "Original by",
+			"img": "./img/marco-scabia.png"
+		},
+		{
+			"name": "Josh Tynjala",
+			"prefix": "Adapted by",
+			"img": "./img/josh-tynjala.jpg"
+		}
+	],
+	"requirements": {
+		"knowledge": "Basic familiarity with OpenFL and the Stage3D API is recommended. Prior experience working with VertexBuffer is also recommended. Be sure to read the previous tutorial in this series on Stage3D <a href=\"./how-stage3d-works.md\">How Stage3D works</a> before completing this tutorial.",
+		"userLevel": "Intermediate",
+		"software": [
+			{
+				"label": "Haxe 4.2 or newer",
+				"url": "https://haxe.org/"
+			},
+			{
+				"label": "OpenFL 9.5 or newer",
+				"url": "https://openfl.org/"
+			}
+		]
+	}
+}

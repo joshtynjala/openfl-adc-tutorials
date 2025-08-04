@@ -1,0 +1,29 @@
+{
+	"description": "Get started working with Stage3D to leverage hardware acceleration in OpenFL projects.",
+	"authors": [
+		{
+			"name": "Marco Scabia",
+			"prefix": "Original by",
+			"img": "./img/marco-scabia.png"
+		},
+		{
+			"name": "Josh Tynjala",
+			"prefix": "Adapted by",
+			"img": "./img/josh-tynjala.jpg"
+		}
+	],
+	"requirements": {
+		"knowledge": "A basic understanding of working with OpenFL to build games and applications is recommended. Prior experience developing with the Haxe programming language is also required.",
+		"userLevel": "Beginning",
+		"software": [
+			{
+				"label": "Haxe 4.2 or newer",
+				"url": "https://haxe.org/"
+			},
+			{
+				"label": "OpenFL 9.5 or newer",
+				"url": "https://openfl.org/"
+			}
+		]
+	}
+}

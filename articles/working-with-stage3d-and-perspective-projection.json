@@ -1,0 +1,35 @@
+{
+	"description": "Extend the sample project created in the Stage3D series to add perspective.",
+	"authors": [
+		{
+			"name": "Marco Scabia",
+			"prefix": "Original by",
+			"img": "./img/marco-scabia.png"
+		},
+		{
+			"name": "Josh Tynjala",
+			"prefix": "Adapted by",
+			"img": "./img/josh-tynjala.jpg"
+		}
+	],
+	"requirements": {
+		"knowledge": "Prior experience setting up and running an ActionScript project based on the Stage3D API is required. Before following along with the instructions provided here, be sure to complete the previous tutorials in this series on working with Stage3D (1. <a href=\"./how-stage3d-works.md\">How Stage3D works</a>, 2. <a href=\"./vertex-and-fragment-shaders.md\">Vertex and fragment shaders</a>, 3. <a href=\"./what-is-agal.md\">What is AGAL?</a>, 4. <a href=\"./hello-triangle.md\">Hello Triangle</a>.",
+		"userLevel": "Intermediate",
+		"samples": [
+			{
+				"label": "perspective-projection",
+				"url": "https://github.com/joshtynjala/openfl-adc-tutorials-samples/tree/main/perspective-sample"
+			}
+		],
+		"software": [
+			{
+				"label": "Haxe 4.2 or newer",
+				"url": "https://haxe.org/"
+			},
+			{
+				"label": "OpenFL 9.5 or newer",
+				"url": "https://openfl.org/"
+			}
+		]
+	}
+}

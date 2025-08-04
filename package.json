@@ -1,0 +1,18 @@
+{
+  "name": "openfl-adc-tutorials",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npx rimraf _site && npx @11ty/eleventy",
+    "start": "npx @11ty/eleventy --serve"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.2",
+    "clean-css": "^5.3.3",
+    "eleventy-plugin-toc": "^1.1.5",
+    "html-minifier": "^4.0.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "rimraf": "^6.0.1"
+  }
+}

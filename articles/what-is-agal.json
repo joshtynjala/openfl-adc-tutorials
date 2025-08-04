@@ -1,0 +1,29 @@
+{
+	"description": "Learn about shader languages and how to build an OpenFL app with the Stage3D API.",
+	"authors": [
+		{
+			"name": "Marco Scabia",
+			"prefix": "Original by",
+			"img": "./img/marco-scabia.png"
+		},
+		{
+			"name": "Josh Tynjala",
+			"prefix": "Adapted by",
+			"img": "./img/josh-tynjala.jpg"
+		}
+	],
+	"requirements": {
+		"knowledge": "Basic familiarity with the Stage3D API is required. Prior knowledge of working with shaders and understanding how the Programmable Function Pipeline operates is also recommended. Be sure to read first the first two tutorials in this series on Stage3D (1. <a href=\"./how-stage3d-works.md\">How Stage3D works</a>, 2. <a href=\"./vertex-and-fragment-shaders.md\">Vertex and Fragment Shaders</a> before following along with these instructions.",
+		"userLevel": "Intermediate",
+		"software": [
+			{
+				"label": "Haxe 4.2 or newer",
+				"url": "https://haxe.org/"
+			},
+			{
+				"label": "OpenFL 9.5 or newer",
+				"url": "https://openfl.org/"
+			}
+		]
+	}
+}

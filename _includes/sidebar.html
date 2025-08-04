@@ -1,0 +1,95 @@
+
+<aside class="sidebar">
+  <div class="authors">
+  {% if authors %}
+  {% for author in authors %}
+    <div class="author">
+    {% if author.img %}
+      <img src="{{ author.img }}" alt="{{ author.name }}"/>
+    {%if author.name %}
+    <p><cite>{% if author.prefix %}{{ author.prefix }}{% else %}by {% endif %} {{ author.name }}</cite></p>
+    {% endif %}
+    {% else %}
+    {% if author.name %}
+      <p><cite>{% if author.prefix %}{{ author.prefix }}{% else %}by {% endif %} {{ author.name }}</cite></p>
+    {% else %}
+      <p><cite>{% if author.prefix %}{{ author.prefix }}{% else %}by {% endif %} {{ author }}</cite></p>
+    {% endif %}
+    {% endif %}
+    </div>
+  {% endfor %}
+  {% elsif author %}
+    <div class="author">
+    {% if author.img %}
+      <img src="{{ author.img }}" alt="{{ author.name }}"/>
+    {% endif %}
+    {% if author.name %}
+      <p><cite>{% if author.prefix %}{{ author.prefix }}{% else %}by {% endif %} {{ author.name }}</cite></p>
+    {% else %}
+      <p><cite>{% if author.prefix %}{{ author.prefix }}{% else %}by {% endif %} {{ author }}</cite></p>
+    {% endif %}
+    </div>
+  {% endif %}
+  </div>
+  {% if skiptoc == nil or skiptoc == false %}
+  <div class="toc">
+  <h2>Content</h2>
+  {{ content | toc }}
+  </div>
+  {% endif %}
+  {% if requirements %}
+  <div class="requirements">
+    <h2>Requirements</h2>
+    {% if requirements.knowledge %}
+    <h3>Prerequisite knowledge</h3>
+    <p>{{ requirements.knowledge }}</p>
+    {% endif %}
+    {% if requirements.userLevel %}
+    <h3>User Level</h3>
+    <p>{{ requirements.userLevel }}</p>
+    {% endif %}
+    {% if requirements.software %}
+    <h3>Required Software</h3>
+    <ul>
+      {% for item in requirements.software %}
+      {% if item.url %}
+      <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+      {% elsif item.label %}
+      <li>{{ item.label }}</li>
+      {% else %}
+      <li>{{ item }}</li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if requirements.optionalSoftware %}
+    <h3>Optional Software</h3>
+    <ul>
+      {% for item in requirements.optionalSoftware %}
+      {% if item.url %}
+      <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+      {% elsif item.label %}
+      <li>{{ item.label }}</li>
+      {% else %}
+      <li>{{ item }}</li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if requirements.samples %}
+    <h3>Sample Projects</h3>
+    <ul>
+      {% for item in requirements.samples %}
+      {% if item.url %}
+      <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+      {% elsif item.label %}
+      <li>{{ item.label }}</li>
+      {% else %}
+      <li>{{ item }}</li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% endif %}
+</aside>

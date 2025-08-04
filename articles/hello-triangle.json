@@ -1,0 +1,49 @@
+{
+	"description": "Learn how to build simple Stage3D apps to render colored and textured geometry in order to display 3D objects.",
+	"authors": [
+		{
+			"name": "Marco Scabia",
+			"prefix": "Original by",
+			"img": "./img/marco-scabia.png"
+		},
+		{
+			"name": "Josh Tynjala",
+			"prefix": "Adapted by",
+			"img": "./img/josh-tynjala.jpg"
+		}
+	],
+	"requirements": {
+		"knowledge": "Familiarity working with the Stage3D API and a basic understanding of how it is structured is required. Basic knowledge of Vertex and Fragment Shaders, and the AGAL shading language is also recommended. Before completing this tutorial, be sure to follow along with the previous tutorials in this series on Stage3D (1. <a href=\"./how-stage3d-works.md\">How Stage3D works</a>, 2. <a href=\"./vertex-and-fragment-shaders.md\">Vertex and Fragment Shaders</a> 3. <a href=\"./what-is-agal.md\">What is AGAL</a>).",
+		"userLevel": "Intermediate",
+		"samples": [
+			{
+				"label": "hello-triangle-colored",
+				"url": "https://github.com/joshtynjala/openfl-adc-tutorials-samples/tree/main/hello-triangle-colored"
+			},
+			{
+				"label": "hello-triangle-textured",
+				"url": "https://github.com/joshtynjala/openfl-adc-tutorials-samples/tree/main/hello-triangle-textured"
+			}
+		],
+		"software": [
+			{
+				"label": "Haxe 4.2 or newer",
+				"url": "https://haxe.org/"
+			},
+			{
+				"label": "OpenFL 9.5 or newer",
+				"url": "https://openfl.org/"
+			}
+		],
+		"optionalSoftware": [
+			{
+				"label": "Visual Studio Code",
+				"url": "https://code.visualstudio.com/"
+			},
+			{
+				"label": "Lime extension for VSCode",
+				"url": "https://marketplace.visualstudio.com/items?itemName=openfl.lime-vscode-extension"
+			}
+		]
+	}
+}

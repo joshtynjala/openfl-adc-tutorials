@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include "meta.html" %}
+  <title>{{ content | extract_title }} | {{ siteTitle }}</title>
+  {% include "styles.html" %}
+  {% if ogImage or ogDescription %}
+    {% include "opengraph.html" %}
+  {% endif %}
+</head>
+<body>
+  {% include "header.html" %}
+  <main>
+    <h1>{{ content | extract_title }}</h1>
+    <div class="main-content">
+      <article>{{ content | omit_title }}</article>
+    </div>
+  </main>
+  {% include "footer.html" %}
+</body>
+</html>
