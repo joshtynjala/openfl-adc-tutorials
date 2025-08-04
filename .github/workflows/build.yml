@@ -19,3 +19,9 @@ jobs:
       - run: |
           npm ci
           npm run build
+      - name: Upload to gh-pages
+        if: ${{ github.repository == 'joshtynjala/openfl-adc-tutorials' && github.event_name != 'pull_request' && github.ref_name == 'main' }}
+        uses: JamesIves/github-pages-deploy-action@v4.6.0
+        with:
+          branch: gh-pages
+          folder: _site
