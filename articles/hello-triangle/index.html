@@ -1,0 +1,331 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hello Triangle | OpenFL Tutorials</title><link href="/css/styles.css" rel="stylesheet"></head><body><main><h1>Hello Triangle</h1><div class="main-content"><aside class="sidebar"><div class="authors"><div class="author"><img src="/articles/img/marco-scabia.png" alt="Marco Scabia"><p><cite>Original by Marco Scabia</cite></p></div><div class="author"><img src="/articles/img/josh-tynjala.jpg" alt="Josh Tynjala"><p><cite>Adapted by Josh Tynjala</cite></p></div></div><div class="toc"><h2>Content</h2><nav class="toc"><ol><li><a href="#setting-up-the-build-environment">Setting up the build environment</a></li><li><a href="#initializing-stage3d">Initializing Stage3D</a></li><li><a href="#creating-a-colored-triangle-geometry">Creating a colored triangle geometry</a></li><li><a href="#rendering-the-scene">Rendering the scene</a></li><li><a href="#applying-texture-mapping">Applying texture mapping</a><ol><li><a href="#working-with-uv-coordinates">Working with UV coordinates</a></li></ol></li><li><a href="#working-with-the-texture-class-in-the-stage3d-api">Working with the Texture class in the Stage3D API</a><ol><li><a href="#modifying-the-hello-triangle-colored-application-to-apply-a-texture-map">Modifying the Hello Triangle Colored application to apply a texture map</a></li></ol></li><li><a href="#where-to-go-from-here">Where to go from here</a></li></ol></nav></div><div class="requirements"><h2>Requirements</h2><h3>Prerequisite knowledge</h3><p>Familiarity working with the Stage3D API and a basic understanding of how it is structured is required. Basic knowledge of Vertex and Fragment Shaders, and the AGAL shading language is also recommended. Before completing this tutorial, be sure to follow along with the previous tutorials in this series on Stage3D (1. <a href="/articles/how-stage3d-works/">How Stage3D works</a>, 2. <a href="/articles/vertex-and-fragment-shaders/">Vertex and Fragment Shaders</a> 3. <a href="/articles/what-is-agal/">What is AGAL</a>).</p><h3>User Level</h3><p>Intermediate</p><h3>Required Software</h3><ul><li><a href="https://haxe.org/">Haxe 4.2 or newer</a></li><li><a href="https://openfl.org/">OpenFL 9.5 or newer</a></li></ul><h3>Optional Software</h3><ul><li><a href="https://code.visualstudio.com/">Visual Studio Code</a></li><li><a href="https://marketplace.visualstudio.com/items?itemName=openfl.lime-vscode-extension">Lime extension for VSCode</a></li></ul><h3>Sample Projects</h3><ul><li><a href="https://github.com/joshtynjala/openfl-adc-tutorials-samples/tree/main/hello-triangle-colored">hello-triangle-colored</a></li><li><a href="https://github.com/joshtynjala/openfl-adc-tutorials-samples/tree/main/hello-triangle-textured">hello-triangle-textured</a></li></ul></div></aside><article><p>In this article you'll examine a working OpenFL application based on the Stage3D API. First you'll to learn how to properly configure a Stage3D-ready build environment. Once the sample project is set up, you'll see how to initialize Stage3D from Haxe, and how to create and render a super simple 3D scene consisting of a single colored triangle using Stage3D.</p><p>Finally, you'll take a look at the process of applying texture mapping and you'll review a Stage3D application with a texture mapped geometry.</p><h3 id="setting-up-the-build-environment" tabindex="-1">Setting up the build environment</h3><p>When you get started building Stage3D apps, the first task involves preparing your build environment and ensuring it is properly setup.</p><p>While it's certainly possible to build Stage3D applications using the barebones Haxe compiler from the command line, it is often more convenient to use an integrated tool such as Visual Studio Code or IntelliJ IDEA. The steps provided in this article focus on working with Visual Studio Code.</p><p>If you haven't already, install Haxe and OpenFL. Begin by downloading and installing the latest version of <a href="https://haxe.org/download/">Haxe</a> from the official website, or from your favorite package manager.</p><p>Next, open a terminal and run the following commands to install OpenFL from Haxelib:</p><pre><code class="language-sh">haxelib install openfl
+haxelib run openfl setup
+</code></pre><p>Now that you've set up the Haxe and OpenFL, you are ready to create a new OpenFL project in Visual Studio Code.</p><p>If you've haven't yet installed the <a href="https://marketplace.visualstudio.com/items?itemName=openfl.lime-vscode-extension">Lime extension for VSCode</a>, it's pretty simple.</p><ol><li><p>In Visual Studio Code, select <strong>View</strong> &gt; <strong>Extensions</strong>.</p></li><li><p>Search for the <strong>Lime</strong> extension by <strong>OpenFL</strong>.</p></li><li><p>Click the <strong>Install</strong> button.</p></li></ol><p>With your development environment all set up, it's time to create a new project.</p><p>You will create an empty folder and run a command to create a project in that folder.</p><ol><li><p>In Visual Studio Code, select <strong>File</strong> &gt; <strong>Open Folder…</strong></p></li><li><p>Create an empty folder for your project somewhere on your computer. Call it <strong>HelloTriangle</strong>.</p></li><li><p>Select the empty <strong>HelloTriangle</strong> folder and click Open.</p></li><li><p>Select <strong>View</strong> &gt; <strong>Command Palette…</strong>.</p></li><li><p>Search for and execute the <strong>OpenFL: Create New Project</strong> command.</p></li><li><p>When prompted to select a folder where the project should be created, select the empty <strong>HelloTriangle</strong> folder.</p></li></ol><p>To make sure that everything compiles and runs properly, run Lime's test command.</p><ol><li><p>Select <strong>Run</strong> &gt; <strong>Start Debugging</strong>.</p></li><li><p>From the list of available debuggers, select <strong>Lime</strong>.</p></li><li><p>A <strong>launch.json</strong> file will open with the following launch configuration:</p><pre><code>{
+    &quot;name&quot;: &quot;Lime&quot;,
+    &quot;type&quot;: &quot;lime&quot;,
+    &quot;request&quot;: &quot;launch&quot;
+}
+</code></pre></li><li><p>Select <strong>Run</strong> &gt; <strong>Start Debugging</strong> again.</p></li></ol><p>The project will build, and your web browser will launch a blank window.</p><blockquote><p>Alternatively, you may compile and run the project from a terminal. Open a terminal, navigate to the HelloTriangle folder, and run the following command:</p><pre><code class="language-sh">lime test html5 -debug
+</code></pre></blockquote><p>Next, we'll add some Haxe code to actually display something in the browser using Stage3D.</p><h3 id="initializing-stage3d" tabindex="-1">Initializing Stage3D</h3><p>Now that you've set up the OpenFL app, the first thing you'll do is initialize Stage3D.</p><p>In order to perform 3D rendering, you'll need an instance of the Context3D class, which is basically going to serve as a 3D rendering surface.</p><p>So, in the constructor, add the following code:</p><pre><code class="language-haxe">public function new()
+{
+    super();
+    stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
+    stage.stage3Ds[0].requestContext3D();
+}
+</code></pre><p>The code above simply requests a Context3D instance using the Stage3D API, and registers an event listener. When the Context3D instance is ready, the <code>initStage3D</code> function is called back by the event.</p><p>As soon as <code>initStage3D</code> is called, it's important to properly configure your Context3D instance by calling the <code>configureBackBuffer</code> method:</p><pre><code class="language-haxe">private function initStage3D(e:Event):Void
+{
+    context3D = stage.stage3Ds[0].context3D;
+    context3D.configureBackBuffer(800, 600, 2, true);
+    ...
+}
+</code></pre><p>The code above specifies that you are using an 800 x 600 pixel rendering viewport, with a minimal level of anti-aliasing (the third parameter), and creating depth and stencil buffers for this rendering surface (the fourth parameter).</p><h3 id="creating-a-colored-triangle-geometry" tabindex="-1">Creating a colored triangle geometry</h3><p>In this section you'll create some 3D geometry (the 3D object to be rendered). For this sample, you'll create the simplest geometry possible: a colored triangle.</p><p>To accomplish this, you'll need a Vertex Buffer, and you are going to specify Vertex Attributes for vertex position (x, y, z) and vertex color (r, g, b). Each vertex has 6 components. Begin by defining this Vertex Buffer data into a vector, like this:</p><pre><code class="language-haxe">private function initStage3D(e:Event):Void
+{
+    ...
+    var vertices:Vector&lt;Float&gt; = Vector.ofValues(
+        -0.3,-0.3, 0.0, 1.0, 0.0, 0.0, // x, y, z, r, g, b
+        -0.3, 0.3, 0.0, 0.0, 1.0, 0.0,
+         0.3, 0.3, 0.0, 0.0, 0.0, 1.0);
+    ...
+}
+</code></pre><p>Then, create a VertexBuffer3D instance that you can use to upload the Vertex Buffer data to the GPU.</p><pre><code class="language-haxe">private var vertexBuffer:VertexBuffer3D;
+...
+private function initStage3D(e:Event):Void
+{
+    ...
+    // Create VertexBuffer3D. 3 vertices, of 6 Floats each
+    vertexBuffer:VertexBuffer3D = context3D.createVertexBuffer(3, 6);
+    // Upload VertexBuffer3D to GPU. Offset 0, 3 vertices
+    vertexBuffer.uploadFromVector(vertices, 0, 3);
+    ...
+}
+</code></pre><p>You'll also need an Index Buffer to define your triangle. In this case, the lone triangle will simply consist of vertices 0, 1 and 2. Similar to the Vertex Buffer, the Index Buffer must also be uploaded to the GPU. To achieve this you'll use the IndexBuffer3D class:</p><pre><code class="language-haxe">private var indexBuffer:IndexBuffer3D;
+...
+private function initStage3D(e:Event):Void
+{
+    ...
+    var indices:Vector&lt;UInt&gt; = Vector.ofValues(0, 1, 2);
+    // Create IndexBuffer3D. Total of 3 indices. 1 triangle of 3 vertices
+    indexBuffer = context3D.createIndexBuffer(3);
+    // Upload IndexBuffer3D to GPU. Offset 0, count 3
+    indexBuffer.uploadFromVector(indices, 0, 3);
+    ...
+}
+</code></pre><p>The code above defines the geometry. Now you need both a Vertex and a Fragment Shader.</p><p>To keep it simple, you'll use the same shader program discussed in a previous article in this series titled <a href="/articles/what-is-agal/">What is AGAL?</a>. The Vertex Shader simply transforms the vertices according to a transform matrix passed in from Haxe, and then passes along the vertex color down the rendering pipeline to the Fragment Shader.</p><p>m44 op, va0, vc0 mov v0, va1</p><p>The Fragment Shader gets the interpolated color from its input and passes it along as output color.</p><p>mov oc, v0</p><p>You'll use <a href="https://github.com/Gamua/Starling-Framework/blob/master/starling/src/com/adobe/utils/AGALMiniAssembler.as">AGAL Mini Assembler</a> to assemble the shader code into object code, and then use the Program3D API class to upload the shader to the GPU.</p><pre><code class="language-haxe">private function initStage3D(e:Event):Void
+{
+    ...
+    var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+    vertexShaderAssembler.assemble(Context3DProgramType.VERTEX,
+        &quot;m44 op, va0, vc0\n&quot; + // pos to clipspace
+        &quot;mov v0, va1&quot; // copy color
+    );
+
+    var fragmentShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+    fragmentShaderAssembler.assemble(Context3DProgramType.FRAGMENT,
+
+        &quot;mov oc, v0 &quot;
+    );
+
+    program = context3D.createProgram();
+    program.upload(vertexShaderAssembler.agalcode, fragmentShaderAssembler.agalcode);
+    ...
+}
+</code></pre><h3 id="rendering-the-scene" tabindex="-1">Rendering the scene</h3><p>At this point, the scene is now ready for rendering. In this section, you'll set up a rendering loop. Just create an <code>onRender</code> function that is called at every frame by an <code>ENTER_FRAME</code> event.</p><pre><code class="language-haxe">private function onRender(e:Event):Void
+{
+    if (context3D == null)
+        return;
+    ...
+}
+</code></pre><p>At the start of each frame render, you'll call <code>clear()</code> on the <code>Context3D</code> instance. This clears the rendering color buffer (the surface on which the content is rendered) with a background color that we pass in (as the depth and stencil buffers associated with the Context3D get cleared). Use the code shown below to pass in a white background:</p><pre><code class="language-haxe">private function onRender(e:Event):Void
+{
+    ...
+    context3D.clear(1, 1, 1, 1);
+    ...
+}
+</code></pre><p>At each frame you'll have to enable the Program3D with the uploaded Shaders, as well as the VertexBuffer3D, associating the Vertex Attributes with the proper Shader Attribute Registers, as discussed in the previous article <a href="/articles/what-is-agal/">What is AGAL</a>.</p><p>You'll also need to pass in the transform matrix, used by the Vertex Shader. Let's use a rotation matrix that varies at each frame, to let our triangle spin a little bit…</p><pre><code class="language-haxe">private function onRender(e:Event):Void
+{
+    ...
+    // vertex position to attribute register 0
+    context3D.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+    // color to attribute register 1
+    context3D.setVertexBufferAt(1, vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_3);
+    // assign shader program
+    context3D.setProgram(program);
+
+    var m:Matrix3D = new Matrix3D();
+    m.appendRotation(Lib.getTimer() / 40.0, Vector3D.Z_AXIS);
+    context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, m, true);
+    ...
+}
+</code></pre><p>After setting this up, it's time to perform the actual rendering. You'll need to call the <code>drawTriangles</code> method on the <code>Context3D</code> instance, passing in the Index Buffer; this operation will render the triangle to the rendering surface (the color buffer).</p><p>Finally, after you are finished rendering all the 3D objects of the scene in that frame (in this example, there is only one), you'll need to call the <code>present</code> method on the <code>Context3D</code> instance. This method tells Stage3D that the app has rendered the frame and the frame is ready to be presented to the screen.</p><pre><code class="language-haxe">private function onRender(e:Event):Void
+{
+    ...
+    context3D.drawTriangles(indexBuffer);
+
+    context3D.present();
+}
+</code></pre><p>Run the Hello Triangle Colored application to see the finished result and take a moment to enjoy your creation (see Figure 2).</p><p><img src="/articles/hello-triangle/hello-triangle-colored.jpg" alt="Figure 1. The completed Hello Triangle Colored application."></p><p><em>Figure 1. The completed Hello Triangle Colored application.</em></p><p>Here is the entire code sample used to create the Hello Triangle Colored application:</p><pre><code class="language-haxe">import openfl.Lib;
+import openfl.Vector;
+import openfl.display.Sprite;
+import openfl.display3D.Context3D;
+import openfl.display3D.Context3DProgramType;
+import openfl.display3D.Context3DVertexBufferFormat;
+import openfl.display3D.IndexBuffer3D;
+import openfl.display3D.Program3D;
+import openfl.display3D.VertexBuffer3D;
+import openfl.events.Event;
+import openfl.geom.Matrix3D;
+import openfl.geom.Vector3D;
+import openfl.utils.AGALMiniAssembler;
+
+class HelloTriangleColored extends Sprite
+{
+    private var context3D:Context3D;
+    private var program:Program3D;
+    private var vertexBuffer:VertexBuffer3D;
+    private var indexBuffer:IndexBuffer3D;
+
+    public function new()
+    {
+        super();
+
+        stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
+        stage.stage3Ds[0].requestContext3D();
+
+        addEventListener(Event.ENTER_FRAME, onRender);
+
+    }
+
+    private function initStage3D(e:Event):Void
+    {
+        context3D = stage.stage3Ds[0].context3D;
+        context3D.configureBackBuffer(800, 600, 1, true);
+
+        var vertices:Vector&lt;Float&gt; = Vector.ofValues(
+            -0.3,-0.3, 0.0, 1.0, 0.0, 0.0, // x, y, z, r, g, b
+            -0.3, 0.3, 0.0, 0.0, 1.0, 0.0,
+             0.3, 0.3, 0.0, 0.0, 0.0, 1.0);
+
+        // Create VertexBuffer3D. 3 vertices, of 6 Floats each
+        vertexBuffer = context3D.createVertexBuffer(3, 6);
+        // Upload VertexBuffer3D to GPU. Offset 0, 3 vertices
+        vertexBuffer.uploadFromVector(vertices, 0, 3);
+
+        var indices:Vector&lt;UInt&gt; = Vector.ofValues(0, 1, 2);
+
+        // Create IndexBuffer3D. Total of 3 indices. 1 triangle of 3 vertices
+        indexBuffer = context3D.createIndexBuffer(3);
+        // Upload IndexBuffer3D to GPU. Offset 0, count 3
+        indexBuffer.uploadFromVector(indices, 0, 3);
+
+        var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+        vertexShaderAssembler.assemble(Context3DProgramType.VERTEX,
+            &quot;m44 op, va0, vc0\n&quot; + // pos to clipspace
+            &quot;mov v0, va1&quot; // copy color
+        );
+
+        var fragmentShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+        fragmentShaderAssembler.assemble(Context3DProgramType.FRAGMENT,
+
+            &quot;mov oc, v0&quot;
+        );
+
+        program = context3D.createProgram();
+        program.upload(vertexShaderAssembler.agalcode, fragmentShaderAssembler.agalcode);
+    }
+
+    private function onRender(e:Event):Void
+    {
+        if (context3D == null)
+            return;
+
+        context3D.clear(1, 1, 1, 1);
+
+        // vertex position to attribute register 0
+        context3D.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+        // color to attribute register 1
+        context3D.setVertexBufferAt(1, vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_3);
+        // assign shader program
+        context3D.setProgram(program);
+
+        var m:Matrix3D = new Matrix3D();
+        m.appendRotation(Lib.getTimer() / 40.0, Vector3D.Z_AXIS);
+        context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, m, true);
+
+        context3D.drawTriangles(indexBuffer);
+
+        context3D.present();
+    }
+}
+</code></pre><h3 id="applying-texture-mapping" tabindex="-1">Applying texture mapping</h3><p>The Hello Triangle Colored application that you built in the previous part of this article renders a colored triangle. The triangle's colors are specified as Vertex Attributes, which are part of the Vertex Buffer. The triangle is an example of colored geometry and the colors are specified per-vertex.</p><p>In this section you'll explore a different way to render a geometry, using a common technique called texture mapping. Texture mapping is the process of using an image (a texture) to apply it to the geometry. You can think of this texture image as though it is an illustrated piece of paper, sort of like a piece of wallpaper. Specify a triangle (or, more generally, a 3D object), and wrap this illustrated paper around the surface of the object.</p><p>Using this strategy, you can render a 3D object <strong>as if</strong> it really contains all those tiny details from the illustrated texture. In reality, the texture details are not actually part of the geometry. The visual complexity is simply illustrated details from the applied texture image.</p><p>When you apply texture mapping you'll specify the exact positions the texture elements need to be placed on top of the geometry. Basically, when you wrap the geometry around with the texture image, you need to create a precise mapping that defines exactly where each pixel of the texture image should fall on the 3D geometry.</p><h4 id="working-with-uv-coordinates" tabindex="-1">Working with UV coordinates</h4><p>The way to line up a texture on the 3D geometry involves specifying the mapping on a per-vertex basis: for each vertex you specify a pair of 2D coordinates, indicated as (U, V), that define the point of the texture image that corresponds to that specific vertex. So, these UV coordinates are specified as Vertex Attributes in the Vertex Buffer and the Vertex Shader receives them as an input stream.</p><p>Then, as it normally happens with Vertex Attributes, the Vertex Shader passes the UV coordinates out as outputs down the rendering pipeline, and the Rasterizer interpolates them (for more details, see a previous article in this series titled <a href="/articles/vertex-and-fragment-shaders/">Vertex and Fragment Shaders</a>). In this way, the Fragment Shader receives the proper values of the UV coordinates for each triangle Fragment (for each pixel that will be rendered). So, each pixel of each rendered triangle gets mapped to a specific pixel of the texture (also known as a texture element, or texel).</p><p>In other words, by specifying the UV coordinates, you've created a mapping between the 3D geometry and the texture image. The is the concept behind the term texture mapping.</p><h3 id="working-with-the-texture-class-in-the-stage3d-api" tabindex="-1">Working with the Texture class in the Stage3D API</h3><p>The Texture class in the Stage3D API includes support for applying textures.</p><p>A texture image must first be uploaded to the GPU memory in order to be used during rendering. You can use the Texture class to upload a texture image to the GPU, using the following code:</p><pre><code class="language-haxe">private var texture:Texture;
+...
+
+private function initStage3D(e:Event):Void
+{
+    ...
+    var bitmapData:BitmapData = Assets.getBitmapData(&quot;assets/img/RockSmooth.jpg&quot;);
+    texture = context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
+    texture.uploadFromBitmapData(bitmapData);
+    ...
+}
+</code></pre><p>As discussed above, the Vertex Shader receives the UV texture coordinates as a Vertex Attribute, and passes them as output down the rendering pipeline so that they can be properly interpolated and fed to the Fragment Shader. The Vertex Shader is very similar to the the colored triangle sample project described above, except that Attribute Register 1 contains UV coordinates instead of color values.</p><p>m44 op, va0, vc0 mov v0, va1</p><p>The Fragment Shader receives the interpolated UV coordinates and uses them to sample the texture, through a Texture Sampler.</p><p>Let's imagine that the texture is associated to Haxe to Texture Sampler 0. In this case, the Fragment Shader will be:</p><p>tex ft1, v0, fs0 &lt;2d&gt; mov oc, ft1</p><p>The first line of the Fragment Shader samples the texture using Texture Sampler 0 and the UV coordinates in varying register 0, and copies the result into Temporary Register 1. The second line simply copies the content of Temporary Register 1 (the sampled texture) to the output.</p><h4 id="modifying-the-hello-triangle-colored-application-to-apply-a-texture-map" tabindex="-1">Modifying the Hello Triangle Colored application to apply a texture map</h4><p>In this section you'll modify the previous Hello Triangle application, so that it uses texture mapping.</p><p>The first thing to update in the application is to add an image for a texture. In your OpenFL project.xml file, add an <code>&lt;assets/&gt;</code> element to load an external texture image:</p><pre><code class="language-xml">...
+    &lt;assets path=&quot;assets/img/RockSmooth.jpg&quot;/&gt;
+&lt;/project&gt;
+</code></pre><p>You'll also need to change the definition of the Vertex Buffer. Rather than passing the color Vertex Attribute, you'll provide UV coordinates:</p><pre><code class="language-haxe">private function initStage3D(e:Event):Void
+{
+    ...
+    var vertices:Vector&lt;Float&gt; = Vector.ofValues(
+        -0.3,-0.3,0.0, 1.0, 0.0, // x, y, z, u, v
+        -0.3, 0.3, 0.0, 0.0, 1.0,
+         0.3, 0.3, 0.0, 1.0, 1.0);
+
+    // Create VertexBuffer3D. 3 vertices, of 5 Floats each
+    vertexBuffer = context3D.createVertexBuffer(3, 5);
+    // Upload VertexBuffer3D to GPU. Offset 0, 3 vertices
+    vertexBuffer.uploadFromVector(vertices, 0, 3);
+    ...
+}
+</code></pre><p>Notice that UV coordinates are defined between 0 and 1, where (U, V) = (0, 0) means the bottom-left corner of the texture image, and (U, V) = (1, 1) means the top-right corner.</p><p>The rendering loop then enables the Texture object, and associates it to Texture Sampler 0 that is used by the Fragment Shader:</p><p>private function onRender(e:Event):Void { ... // assign texture to texture sampler 0 context3D.setTextureAt(0, texture); ... }</p><p>After making these changes, run the application again to see the textured triangle displayed in the Stage3D app you created (see Figure 3).</p><p><img src="/articles/hello-triangle/hello-triangle-textured.jpg" alt="Figure 2. The completed Hello Triangle Textured application."></p><p><em>Figure 2. The completed Hello Triangle Textured application.</em></p><p>Here's the entire code sample used to create the Hello Textured Triangle application:</p><pre><code class="language-haxe">import openfl.Lib;
+import openfl.Vector;
+import openfl.display.BitmapData;
+import openfl.display.Sprite;
+import openfl.display3D.Context3D;
+import openfl.display3D.Context3DProgramType;
+import openfl.display3D.Context3DTextureFormat;
+import openfl.display3D.Context3DVertexBufferFormat;
+import openfl.display3D.IndexBuffer3D;
+import openfl.display3D.Program3D;
+import openfl.display3D.VertexBuffer3D;
+import openfl.display3D.textures.Texture;
+import openfl.events.Event;
+import openfl.geom.Matrix3D;
+import openfl.geom.Vector3D;
+import openfl.utils.AGALMiniAssembler;
+import openfl.utils.Assets;
+
+class HelloTriangleTextured extends Sprite
+{
+    private var texture:Texture;
+
+    private var context3D:Context3D;
+    private var program:Program3D;
+    private var vertexBuffer:VertexBuffer3D;
+    private var indexBuffer:IndexBuffer3D;
+
+    public function new()
+    {
+        super();
+
+        stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
+        stage.stage3Ds[0].requestContext3D();
+
+        addEventListener(Event.ENTER_FRAME, onRender);
+    }
+
+    private function initStage3D(e:Event):Void
+    {
+        context3D = stage.stage3Ds[0].context3D;
+        context3D.configureBackBuffer(800, 600, 1, true);
+
+        var vertices:Vector&lt;Float&gt; = Vector.ofValues(
+            -0.3,-0.3, 0.0, 1.0, 0.0, // x, y, z, u, v
+            -0.3, 0.3, 0.0, 0.0, 1.0,
+             0.3, 0.3, 0.0, 1.0, 1.0);
+
+        // Create VertexBuffer3D. 3 vertices, of 5 Numbers each
+        vertexBuffer = context3D.createVertexBuffer(3, 5);
+        // Upload VertexBuffer3D to GPU. Offset 0, 3 vertices
+        vertexBuffer.uploadFromVector(vertices, 0, 3);
+
+        var indices:Vector&lt;UInt&gt; = Vector.ofValues(0, 1, 2);
+
+        // Create IndexBuffer3D. Total of 3 indices. 1 triangle of 3 vertices
+        indexBuffer = context3D.createIndexBuffer(3);
+        // Upload IndexBuffer3D to GPU. Offset 0, count 3
+        indexBuffer.uploadFromVector(indices, 0, 3);
+
+        var bitmapData:BitmapData = Assets.getBitmapData(&quot;assets/img/RockSmooth.jpg&quot;);
+        texture = context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
+        texture.uploadFromBitmapData(bitmapData);
+
+        var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+        vertexShaderAssembler.assemble(Context3DProgramType.VERTEX,
+            &quot;m44 op, va0, vc0\n&quot; + // pos to clipspace
+            &quot;mov v0, va1&quot; // copy UV
+        );
+
+        var fragmentShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+        fragmentShaderAssembler.assemble(Context3DProgramType.FRAGMENT,
+            &quot;tex ft1, v0, fs0 &lt;2d&gt;\n&quot; +
+            &quot;mov oc, ft1&quot;
+        );
+
+        program = context3D.createProgram();
+        program.upload(vertexShaderAssembler.agalcode, fragmentShaderAssembler.agalcode);
+    }
+
+    private function onRender(e:Event):Void
+    {
+        if (context3D == null)
+            return;
+
+        context3D.clear(1, 1, 1, 1);
+
+        // vertex position to attribute register 0
+        context3D.setVertexBufferAt(0, vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+        // UV to attribute register 1
+        context3D.setVertexBufferAt(1, vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
+        // assign texture to texture sampler 0
+        context3D.setTextureAt(0, texture);
+        // assign shader program
+        context3D.setProgram(program);
+
+        var m:Matrix3D = new Matrix3D();
+        m.appendRotation(Lib.getTimer() / 40.0, Vector3D.Z_AXIS);
+        context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, m, true);
+
+        context3D.drawTriangles(indexBuffer);
+
+        context3D.present();
+    }
+}
+</code></pre><h3 id="where-to-go-from-here" tabindex="-1">Where to go from here</h3><p>In this article you used the concepts learned in the previous articles in the Stage3D series, to finally drill into the core processes and create two fully working OpenFL applications based on Stage3D. Even though the sample applications just created a simple scene, consisting of a single triangle, all of the concepts of working with Stage3D are included. From here on as you experiment with building Stage3D apps, things will only get deeper and more interesting.</p><p>In the next article in the Stage3D series, you'll learn about a fundamental topic for 3D rendering: working with perspective.</p><ul><li><a href="/articles/working-with-stage3d-and-perspective-projection/">5. Working with Stage3D and perspective projection</a></li><li><a href="/articles/working-with-3d-cameras/">6. Working with 3D cameras</a></li><li><a href="/articles/mipmapping-for-smoother-textures-in-stage3d/">7. Mipmapping for smoother textures in Stage3D</a></li></ul></article></div></main></body></html>

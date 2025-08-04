@@ -1,0 +1,308 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Working with 3D cameras | OpenFL Tutorials</title><link href="/css/styles.css" rel="stylesheet"></head><body><main><h1>Working with 3D cameras</h1><div class="main-content"><aside class="sidebar"><div class="authors"><div class="author"><img src="/articles/img/marco-scabia.png" alt="Marco Scabia"><p><cite>Original by Marco Scabia</cite></p></div><div class="author"><img src="/articles/img/josh-tynjala.jpg" alt="Josh Tynjala"><p><cite>Adapted by Josh Tynjala</cite></p></div></div><div class="toc"><h2>Content</h2><nav class="toc"><ol><li><a href="#working-with-3d-cameras-1">Working with 3D cameras</a></li><li><a href="#understanding-world-space-and-view-space">Understanding world space and view space</a></li><li><a href="#transforming-3d-cameras">Transforming 3D cameras</a></li><li><a href="#building-a-3d-camera-application">Building a 3D camera application</a><ol><li><a href="#a-camera-keyboard-controller">A camera keyboard controller</a></li></ol></li><li><a href="#camera-rendering">Camera rendering</a></li><li><a href="#where-to-go-from-here">Where to go from here</a></li></ol></nav></div><div class="requirements"><h2>Requirements</h2><h3>Prerequisite knowledge</h3><p>Experience setting up and running an OpenFL project based on the Stage3D API is required. Prior knowledge of working with 3D perspective projection is also recommended. Before following along with this tutorial, be sure to complete the previous tutorials in this series on Stage3D (1. <a href="/articles/how-stage3d-works/">How Stage3D works</a>, 2. <a href="/articles/vertex-and-fragment-shaders/">Vertex and fragment shaders</a>, 3. <a href="/articles/what-is-agal/">What is AGAL?</a>, 4. <a href="/articles/hello-triangle/">Hello Triangle</a>, 5. <a href="/articles/working-with-stage3d-and-perspective-projection/">Working with Stage3D and perspective projection</a>.</p><h3>User Level</h3><p>Intermediate</p><h3>Required Software</h3><ul><li><a href="https://haxe.org/">Haxe 4.2 or newer</a></li><li><a href="https://openfl.org/">OpenFL 9.5 or newer</a></li></ul><h3>Sample Projects</h3><ul><li><a href="https://github.com/joshtynjala/openfl-adc-tutorials-samples/tree/main/3d-cameras-demo">3d-cameras-demo</a></li></ul></div></aside><article><p>In this tutorial you'll get an introduction to working with 3D cameras. A 3D camera allows you to create an application where the user can roam through the 3D scene. The instructions provided in this tutorial describe how to create a simple application that features a first person 3D camera that roams around a 3D scene.</p><h3 id="working-with-3d-cameras-1" tabindex="-1">Working with 3D cameras</h3><p>To get a better understanding of 3D cameras, imagine you are shooting a movie. You have to set up a scene that you want to shoot and you need a camera. To get the footage, you'll roam through the scene with your camera, shooting the objects in the scene from different angles and points of view.</p><p>The same filming process occurs with a 3D camera. You need a &quot;virtual&quot; camera, which can roam around the &quot;virtual&quot; scene that you have created.</p><p>Two popular shooting styles involve watching the world through a character's eyes (also known as a first person camera) or pointing the camera at a character and keeping them in view (known as a third person camera).</p><p>This is the basic premise of a 3D camera: a virtual camera that you can use to roam around a 3D scene, and render the footage from a specific point of view.</p><h3 id="understanding-world-space-and-view-space" tabindex="-1">Understanding world space and view space</h3><p>To code this kind of behavior, you'll render the contents of the 3D world from the camera's point of view, not just from the world coordinate system point of view, or from some other fixed point of view.</p><p>Generally speaking, a 3D scene contains a set of 3D models. The models are defined as a set of vertices and triangles, referenced to their own coordinate system. The space in which the models are defined is called the model (or local) space.</p><p>After placing the model objects into a 3D scene, you'll transform these models' vertices using a &quot;world transform&quot; matrix. Each object has its own world matrix that defines where the object is in the world and how it is oriented.</p><p>This new reference system is called &quot;world space' (or global space). A simple way to manage it is by associating a world transform matrix to each object.</p><p>In order to implement the behavior of a 3D camera, you'll need to perform additional steps. You'll reference the world—not to the world origin—but to the reference system of the 3D camera itself.</p><p>A good strategy involves treating the camera as an actual 3D object in the 3D world. Like any other 3D object, you use a &quot;world transform&quot; matrix to place the camera at the desired position and orientation in the 3D world. This <strong>camera world transform matrix</strong> transforms the camera object from the original, looking forward rotation (along the z-axis), to the actual world (xc, yc, zc) position, and world rotation.</p><p>Figure 1 shows the relationships between the World (x, y, z) coordinate system and the View (camera) (x', y', z') coordinate system.</p><p><img src="/articles/3d-cameras/fig01.jpg" alt="Comparing World coordinate systems and View coordinate systems."></p><p><em>Figure 1. Comparing World coordinate systems and View coordinate systems.</em></p><p>Now, you might be wondering what happens to the projection matrix transform described in my previous tutorial titled <a href="/articles/working-with-stage3d-and-perspective-projection/">Working with Stage3D and perspective projection</a>, once you add 3D cameras into the equation. The way it works is that you still apply the perspective projection transform last. So, if you are going to render your 3D scene from the point of view of a 3D camera, you'll first want to apply the 3D camera &quot;view transform.&quot; After that, you'll apply the perspective projection transform.</p><p>So, the entire set of transforms applied to a 3D model part of the 3D scene looks like this:</p><p>model space -&gt; world space world space -&gt; view space view space -&gt; projection space</p><h3 id="transforming-3d-cameras" tabindex="-1">Transforming 3D cameras</h3><p>In this section you'll learn how to calculate the world space -&gt; view space transform.</p><p>Begin with the camera world transform matrix, to transform the camera from the world origin position and its &quot;looking forward&quot; rotation, to the actual current camera position (xc, yc, zc) and its rotation into the 3D world.</p><p>Imagine that you are applying this transform as a Matrix3D property in your application:</p><pre><code class="language-haxe">private var cameraWorldTransform:Matrix3D = new Matrix3D();
+</code></pre><p>You can position the camera by modifying the matrix:</p><pre><code class="language-haxe">cameraWorldTransform.appendRotation(20, Vector3D.Y_AXIS);
+cameraWorldTransform.appendTranslation(2, 3, 5);
+</code></pre><p>Finally, in order to transform the objects as they are seen from the camera point of view, you'll need the inverse of the camera world matrix.</p><pre><code class="language-haxe">viewTransform = cameraWorldTransform.clone()
+viewTransform.invert();
+</code></pre><p>Then, as you render each object, just append the <code>viewTransform</code> to each 3D object's <code>worldTransform</code>.</p><h3 id="building-a-3d-camera-application" tabindex="-1">Building a 3D camera application</h3><p>In this section you'll get started by creating a sample application that features a 3D camera that roams around the 3D scene. I'll start from the code provided in my previous tutorial titled <a href="/articles/working-with-stage3d-and-perspective-projection/">Working with Stage3D and perspective projection</a>.</p><h4 id="a-camera-keyboard-controller" tabindex="-1">A camera keyboard controller</h4><p>The process of properly controlling a 3D camera is not as simple as it might seem. A &quot;good&quot; 3D camera should appear to move naturally. A 3D camera shouldn't get into the way of the user. It should feel so natural that the user simply forgets about it.</p><p>There are many ways to code a 3D camera controller. Controlling a 3D camera can be as simple as rigidly stepping the camera by fixed amounts through the 3D scene as the user presses keys on their keyboard, or it can be as involved as attaching a full blown physics engine to the camera, including collision detection with the objects inside the 3D scene.</p><p>This example illustrates how to build a simple 3D camera controller that uses constant acceleration and some easing in order to control the camera based on user interaction with the keyboard. First, you'll setup some code that translates and rotates the camera around as the user presses the arrow keys. Begin by defining the constant camera accelerations, and then calculate camera velocities in order to set position and rotation from those values.</p><pre><code class="language-haxe">private static final MAX_FORWARD_VELOCITY:Float = 0.05;
+private static final MAX_ROTATION_VELOCITY:Float = 0.5;
+private static final LINEAR_ACCELERATION:Float = 0.0005;
+private static final ROTATION_ACCELERATION:Float = 0.01;
+private static final DAMPING:Float = 1.09;
+</code></pre><p>Listen for the keyboard events:</p><pre><code class="language-haxe">stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownEventHandler);
+stage.addEventListener(KeyboardEvent.KEY_UP, keyUpEventHandler);
+</code></pre><p>Then write the listener functions:</p><pre><code class="language-haxe">private function keyDownEventHandler(e:KeyboardEvent):Void
+{
+    switch (e.keyCode)
+    {
+        case Keyboard.LEFT:
+            cameraRotationAcceleration = -ROTATION_ACCELERATION;
+        case Keyboard.UP:
+            cameraLinearAcceleration = LINEAR_ACCELERATION;
+        case Keyboard.RIGHT:
+            cameraRotationAcceleration = ROTATION_ACCELERATION;
+        case Keyboard.DOWN:
+            cameraLinearAcceleration = -LINEAR_ACCELERATION;
+    }
+}
+
+private function keyUpEventHandler(e:KeyboardEvent):Void
+{
+    switch (e.keyCode)
+    {
+        case Keyboard.LEFT:
+            cameraRotationAcceleration = 0;
+        case Keyboard.RIGHT:
+            cameraRotationAcceleration = 0;
+        case Keyboard.UP:
+            cameraLinearAcceleration = 0;
+        case Keyboard.DOWN:
+            cameraLinearAcceleration = 0;
+    }
+}
+</code></pre><p>The two keyboard event handlers above simply set the linear (translation) and rotation accelerations, based on keyboard input. These accelerations are then used in the <code>updateViewMatrix</code> function, in order to calculate the current camera world position and rotation.</p><p>In this example, the user presses the left and right arrows to rotate the camera. The 3D camera's UP axis is always pointing up. In other words, the camera will simply stand vertical and point forward. With this kind of setup, rotating the camera involves applying a rotation around the Y axis. The <code>updateViewMatrix</code> function applies this rotation, using the current camera position as a pivot point.</p><p>The camera moves forward and backward as the user presses the up and down arrow keys. Now, this camera, before applying the camera world transform matrix, will be pointing along the z-axis, so the camera forward unity vector, in camera local coordinates, is (0, 0, 1). Therefore, the camera forward velocity vector, still in local coordinates, is something like this: <code>(0, 0, forwardVelocity)</code>. The <code>updateViewMatrix</code> function calculates the updated camera position simply by transforming this forward velocity vector to world coordinates.</p><pre><code class="language-haxe">private function updateViewMatrix():Void
+{
+    cameraLinearVelocity.z = calculateUpdatedVelocity(cameraLinearVelocity.z, cameraLinearAcceleration, MAX_FORWARD_VELOCITY);
+    cameraRotationVelocity = calculateUpdatedVelocity(cameraRotationVelocity, cameraRotationAcceleration, MAX_ROTATION_VELOCITY);
+
+    cameraWorldTransform.appendRotation(cameraRotationVelocity, Vector3D.Y_AXIS, cameraWorldTransform.position);
+    cameraWorldTransform.position = cameraWorldTransform.transformVector(cameraLinearVelocity);
+
+    viewTransform.copyFrom(cameraWorldTransform);
+    viewTransform.invert();
+}
+</code></pre><p>The <code>updateViewMatrix</code> function is also where the 3D camera magic happens, as the updated <code>viewTransform</code> is calculated as the inverse of <code>cameraWorldTransform</code>.</p><p>The <code>calculateUpdatedVelocity</code> function below simply calculates the updated velocities starting from the current acceleration. It also adds some easing.</p><pre><code class="language-haxe">private function calculateUpdatedVelocity(curVelocity:Float, curAcceleration:Float, maxVelocity:Float):Float
+{
+    var newVelocity:Float;
+
+    if (curAcceleration != 0)
+    {
+        newVelocity = curVelocity + curAcceleration;
+        if (newVelocity &gt; maxVelocity)
+        {
+            newVelocity = maxVelocity;
+        }
+        else if (newVelocity &lt; -maxVelocity)
+        {
+            newVelocity = - maxVelocity;
+        }
+    }
+    else
+    {
+        newVelocity = curVelocity / DAMPING;
+    }
+    return newVelocity;
+}
+</code></pre><h3 id="camera-rendering" tabindex="-1">Camera rendering</h3><p>After setting up the camera controller, the process of rendering the scene is very simple. At every frame, right before rendering, you'll call the <code>updateViewMatrix</code> function.</p><p>Then, you include the <code>viewTransform</code> matrix into the set of transforms that get passed to the Vertex Shader, like this:</p><pre><code class="language-haxe">private function onRender(e:Event):Void
+{
+    ...
+    updateViewMatrix();
+
+    var m:Matrix3D = new Matrix3D();
+    m.appendRotation(Lib.getTimer() / 30.0, Vector3D.Y_AXIS);
+    m.appendRotation(Lib.getTimer() / 10.0, Vector3D.X_AXIS);
+    m.appendTranslation(0, 0, 2);
+    m.append(viewTransform);
+    m.append(projectionTransform);
+
+    context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, m, true);
+    ...
+}
+</code></pre><p>Here is the entire code used for the 3D camera application:</p><pre><code class="language-haxe">import openfl.Lib;
+import openfl.Vector;
+import openfl.display.BitmapData;
+import openfl.display.Sprite;
+import openfl.display.StageAlign;
+import openfl.display.StageScaleMode;
+import openfl.display3D.Context3D;
+import openfl.display3D.Context3DProgramType;
+import openfl.display3D.Context3DTextureFormat;
+import openfl.display3D.Context3DVertexBufferFormat;
+import openfl.display3D.IndexBuffer3D;
+import openfl.display3D.Program3D;
+import openfl.display3D.VertexBuffer3D;
+import openfl.display3D.textures.Texture;
+import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.geom.Matrix3D;
+import openfl.geom.Vector3D;
+import openfl.ui.Keyboard;
+import openfl.utils.AGALMiniAssembler;
+import openfl.utils.Assets;
+import openfl.utils.PerspectiveMatrix3D;
+
+class CameraDemo extends Sprite
+{
+    private static final MAX_FORWARD_VELOCITY:Float = 0.05;
+    private static final MAX_ROTATION_VELOCITY:Float = 0.5;
+    private static final LINEAR_ACCELERATION:Float = 0.0005;
+    private static final ROTATION_ACCELERATION:Float = 0.01;
+    private static final DAMPING:Float = 1.09;
+
+    private var context3D:Context3D;
+    private var vertexbuffer:VertexBuffer3D;
+    private var indexBuffer:IndexBuffer3D;
+    private var program:Program3D;
+    private var texture:Texture;
+    private var projectionTransform:PerspectiveMatrix3D;
+    private var cameraWorldTransform:Matrix3D;
+    private var viewTransform:Matrix3D;
+    private var cameraLinearVelocity:Vector3D;
+    private var cameraRotationVelocity:Float;
+    private var cameraRotationAcceleration:Float;
+    private var cameraLinearAcceleration:Float;
+
+    public function new()
+    {
+        super();
+
+        stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, initStage3D);
+        stage.stage3Ds[0].requestContext3D();
+
+        stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.align = StageAlign.TOP_LEFT;
+
+        addEventListener(Event.ENTER_FRAME, onRender);
+
+        stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownEventHandler);
+        stage.addEventListener(KeyboardEvent.KEY_UP, keyUpEventHandler);
+    }
+
+    private function keyDownEventHandler(e:KeyboardEvent):Void
+    {
+        switch (e.keyCode)
+        {
+            case Keyboard.LEFT:
+                cameraRotationAcceleration = -ROTATION_ACCELERATION;
+            case Keyboard.UP:
+                cameraLinearAcceleration = LINEAR_ACCELERATION;
+            case Keyboard.RIGHT:
+                cameraRotationAcceleration = ROTATION_ACCELERATION;
+            case Keyboard.DOWN:
+                cameraLinearAcceleration = -LINEAR_ACCELERATION;
+        }
+    }
+
+    private function keyUpEventHandler(e:KeyboardEvent):Void
+    {
+        switch (e.keyCode)
+        {
+            case Keyboard.LEFT:
+                cameraRotationAcceleration = 0;
+            case Keyboard.RIGHT:
+                cameraRotationAcceleration = 0;
+            case Keyboard.UP:
+                cameraLinearAcceleration = 0;
+            case Keyboard.DOWN:
+                cameraLinearAcceleration = 0;
+        }
+    }
+
+    private function initStage3D(e:Event):Void
+    {
+        context3D = stage.stage3Ds[0].context3D;
+
+        context3D.configureBackBuffer(800, 600, 1, true);
+
+        var vertices:Vector&lt;Float&gt; = Vector.ofValues(
+            -0.3,-0.3, 0.0, 0.0, 0.0, // x, y, z, u, v
+            -0.3, 0.3, 0.0, 0.0, 1.0,
+             0.3, 0.3, 0.0, 1.0, 1.0,
+             0.3,-0.3, 0.0, 1.0, 0.0);
+
+        // 4 vertices, of 5 Floats each
+        vertexbuffer = context3D.createVertexBuffer(4, 5);
+        // offset 0, 4 vertices
+        vertexbuffer.uploadFromVector(vertices, 0, 4);
+
+        // total of 6 indices. 2 triangles by 3 vertices each
+        indexBuffer = context3D.createIndexBuffer(6);
+
+        // offset 0, count 6
+        indexBuffer.uploadFromVector(Vector.ofValues(0, 1, 2, 2, 3, 0), 0, 6);
+
+        var bitmapData:BitmapData = Assets.getBitmapData(&quot;assets/img/RockSmooth.jpg&quot;);
+        texture = context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
+        texture.uploadFromBitmapData(bitmapData);
+
+        var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+        vertexShaderAssembler.assemble(Context3DProgramType.VERTEX,
+            &quot;m44 op, va0, vc0\n&quot; + // pos to clipspace
+            &quot;mov v0, va1&quot; // copy uv
+        );
+        var fragmentShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+        fragmentShaderAssembler.assemble(Context3DProgramType.FRAGMENT,
+            &quot;tex ft1, v0, fs0 &lt;2d,linear,nomip&gt;\n&quot; +
+            &quot;mov oc, ft1&quot;
+        );
+
+        program = context3D.createProgram();
+        program.upload(vertexShaderAssembler.agalcode, fragmentShaderAssembler.agalcode);
+
+        cameraWorldTransform = new Matrix3D();
+        cameraWorldTransform.appendTranslation(0, 0, -2);
+        viewTransform = new Matrix3D();
+        viewTransform = cameraWorldTransform.clone();
+        viewTransform.invert();
+
+        cameraLinearVelocity = new Vector3D();
+        cameraRotationVelocity = 0;
+
+        cameraLinearAcceleration = 0;
+        cameraRotationAcceleration = 0;
+
+        projectionTransform = new PerspectiveMatrix3D();
+        var aspect:Float = 4/3;
+        var zNear:Float = 0.1;
+        var zFar:Float = 1000;
+        var fov:Float = 45*Math.PI/180;
+        projectionTransform.perspectiveFieldOfViewLH(fov, aspect, zNear, zFar);
+    }
+
+    private function calculateUpdatedVelocity(curVelocity:Float, curAcceleration:Float, maxVelocity:Float):Float
+    {
+        var newVelocity:Float;
+
+        if (curAcceleration != 0)
+        {
+            newVelocity = curVelocity + curAcceleration;
+            if (newVelocity &gt; maxVelocity)
+            {
+                newVelocity = maxVelocity;
+            }
+            else if (newVelocity &lt; -maxVelocity)
+            {
+                newVelocity = - maxVelocity;
+            }
+        }
+        else
+        {
+            newVelocity = curVelocity / DAMPING;
+        }
+        return newVelocity;
+    }
+
+    private function updateViewMatrix():Void
+    {
+        cameraLinearVelocity.z = calculateUpdatedVelocity(cameraLinearVelocity.z, cameraLinearAcceleration, MAX_FORWARD_VELOCITY);
+        cameraRotationVelocity = calculateUpdatedVelocity(cameraRotationVelocity, cameraRotationAcceleration, MAX_ROTATION_VELOCITY);
+
+        cameraWorldTransform.appendRotation(cameraRotationVelocity, Vector3D.Y_AXIS, cameraWorldTransform.position);
+        cameraWorldTransform.position = cameraWorldTransform.transformVector(cameraLinearVelocity);
+
+        viewTransform.copyFrom(cameraWorldTransform);
+        viewTransform.invert();
+    }
+
+    private function onRender(e:Event):Void
+    {
+        if (context3D == null)
+            return;
+
+        context3D.clear(1, 1, 1, 1);
+
+        // vertex position to attribute register 0
+        context3D.setVertexBufferAt(0, vertexbuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+        // uv coordinates to attribute register 1
+        context3D.setVertexBufferAt(1, vertexbuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
+        // assign texture to texture sampler 0
+        context3D.setTextureAt(0, texture);
+        // assign shader program
+        context3D.setProgram(program);
+
+        updateViewMatrix();
+
+        var m:Matrix3D = new Matrix3D();
+        m.appendRotation(Lib.getTimer() / 30.0, Vector3D.Y_AXIS);
+        m.appendRotation(Lib.getTimer() / 10.0, Vector3D.X_AXIS);
+        m.appendTranslation(0, 0, 2);
+        m.append(viewTransform);
+        m.append(projectionTransform);
+
+        context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, m, true);
+
+        context3D.drawTriangles(indexBuffer);
+
+        context3D.present();
+    }
+}
+</code></pre><h3 id="where-to-go-from-here" tabindex="-1">Where to go from here</h3><p>In this article you received a simple introduction to 3D cameras. You learned how to create a basic application based on Stage3D that features a roaming 3D camera based on user input. The topic of 3D cameras is vast, and there is a lot to cover if you want to research further. To learn more, check out a good book by Mark Haigh-Hutchinson called <a href="https://www.amazon.com/Real-Time-Cameras-Mark-Haigh-Hutchinson/dp/0123116341"><em>Real-Time Cameras</em></a>.</p><p>Continue on to the final tutorial in this Stage3D series to learn about using mipmapping to reduce artifacts in the rendered scene.</p><ul><li><a href="/articles/mipmapping-for-smoother-textures-in-stage3d/">7. Mipmapping for smoother textures in Stage3D</a>.</li></ul></article></div></main></body></html>
