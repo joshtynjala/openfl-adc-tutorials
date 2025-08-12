@@ -5,7 +5,7 @@
   {% for author in authors %}
     <div class="author">
     {% if author.img %}
-      <img src="{{ author.img | url }}"{%if author.name %} alt="{{ author.name }}"{% endif %}/>
+      <img src="{{ author.img | url }}"{%if author.name %} alt="{{ author.name }}"{% endif %} width="160" height="160"/>
     {%if author.name %}
     <p><cite>{% if author.prefix %}{{ author.prefix }}{% else %}by {% endif %} {{ author.name }}</cite></p>
     {% endif %}
