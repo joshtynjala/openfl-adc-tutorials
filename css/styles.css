@@ -210,6 +210,7 @@ a:hover, a:active {
   h1 {
     padding-left: 9px;
     padding-bottom: 9px;
+    margin: 16px 0px;
   }
 
   .sidebar {
