@@ -174,7 +174,7 @@ specify, as a parameter, the mip level to which the image corresponds.
 Here's the code to create a mip level and upload it to the GPU:
 
 ```haxe
-var bitmap:Bitmap = new TextureBitmap();
+var bitmap:Bitmap = Assets.getBitmapData("assets/img/checkers.png");
 texture = context3D.createTexture(bitmap.bitmapData.width, bitmap.bitmapData.height, Context3DTextureFormat.BGRA, false);
 texture.uploadFromBitmapData(bitmap.bitmapData, mipLevel);
 ```
