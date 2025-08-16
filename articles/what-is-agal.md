@@ -129,11 +129,15 @@ Register components can be accessed both through the coordinate accessors
 
 The first component of a register, can be accessed like this:
 
-    <register name>.x
+```
+<register name>.x
+```
 
 As well as with this code:
 
-    <register name>.r
+```
+<register name>.r
+```
 
 Sometimes registers contain coordinate-like data, while other times they contain
 color data. By using the right kind of accessors, you can make your code clearer
@@ -239,7 +243,9 @@ the sampling should be made.
 For example, a standard 2D texture without MIP mapping and linear filtering
 could be sampled into temporary register `ft1`, with the following line:
 
-    tex ft1, v0, fs0 <2d,linear,nomip>
+```
+tex ft1, v0, fs0 <2d,linear,nomip>
+```
 
 In the example above, the varying register `v0` holds the interpolated texture
 UVs.
@@ -264,8 +270,10 @@ and to pass on each vertex color to the Fragment Shader.
 
 You can achieve this with the following code:
 
-    m44 op, va0, vc0 // pos to clipspace
-    mov v0, va1 // copy color
+```
+m44 op, va0, vc0 // pos to clipspace
+mov v0, va1 // copy color
+```
 
 The first line performs a 4×4 matrix multiplication between the vertex input
 attribute register 0, va0, and a transformation matrix that is being passed in
@@ -290,7 +298,9 @@ Fragment Shader.
 The Fragment Shader simply copies the Varying Register `v0` color content to its
 Output Register oc:
 
-    mov oc, v0
+```
+mov oc, v0
+```
 
 So, this Vertex/Fragment Shader pair just transforms the 3D model vertices using
 a transform matrix that gets passed in from Haxe, and applies vertex color.

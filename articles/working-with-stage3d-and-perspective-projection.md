@@ -66,8 +66,10 @@ angles) to the z-axis, at some z that I'll call zProj.
 You can calculate the projected positions xP and yP, by dividing the world
 positions xW, and yW, by zW, like this:
 
-    xP = K1 * xW  / zW
-    yP = K2 * yW / zW
+```
+xP = K1 * xW  / zW
+yP = K2 * yW / zW
+```
 
 K1 and K2 are constants that are derived from geometrical factors such as the
 aspect ratio of your projection plane (your viewport) and the "field of view" of
@@ -111,8 +113,10 @@ xP and yP by zW.
 
 You'll use the following transform:
 
-    xW -> xP' = xP * zW = K1 * xW
-    yW -> yP' = yP * zW = K2 * yW
+```
+xW -> xP' = xP * zW = K1 * xW
+yW -> yP' = yP * zW = K2 * yW
+```
 
 On first sight, since you are projecting to the screen that is 2D, it might seem
 enough to just calculate the projected coordinates for xP and yP. However the
@@ -125,7 +129,9 @@ we wish to render. I'll discuss clipping in more detail later in this tutorial,
 but here is the formula to calculate this transformed zP' to be used for
 clipping:
 
-    zW -> zP' = K3 * (zW - zNear)
+```
+zW -> zP' = K3 * (zW - zNear)
+```
 
 The entire transformation is definitely possible to achieve with a linear matrix
 transform, as the transformed vectors are a linear combination of the world
@@ -134,9 +140,11 @@ vector to transform.
 Next, the actual transformed xP and yP values are obtained by dividing the
 transformed x, y, z, components by w, like this:
 
-    xP = K1 * xW
-    yP = K2 * yW
-    zP = K3 * (zW - zNear) / zW
+```
+xP = K1 * xW
+yP = K2 * yW
+zP = K3 * (zW - zNear) / zW
+```
 
 The calculations shown above are exactly what you need to set up the next part.
 
@@ -145,7 +153,9 @@ The calculations shown above are exactly what you need to set up the next part.
 Stage3D expects you to use a matrix in your Vertex Shader that transforms
 vertices to a special space:
 
-    (x, y, z, w) = (xP', yP', zP', zW)
+```
+(x, y, z, w) = (xP', yP', zP', zW)
+```
 
 With xP', yP', zP' and zW defined as above, and where constants K1, K2 and K3
 are chosen so that xP and yP of all visible points in the 3D world are in the
@@ -181,9 +191,11 @@ outside it.
 The correct values for K1, K2 and K3 to use to get the NDC ranges for xP, yP, zP
 mentioned above are:
 
-    K1 = zProj / aspect
-    K2 = zProj
-    K3 = zFar / (zFar – zNear)
+```
+K1 = zProj / aspect
+K2 = zProj
+K3 = zFar / (zFar – zNear)
+```
 
 In this example, aspect is the viewport aspect ratio.
 
@@ -206,13 +218,17 @@ Figure 2. A side view of the projection reference system.
 
 Using this strategy for calculating the value of zProj:
 
-    zProj = 1 / tg (fov/2)
+```
+zProj = 1 / tg (fov/2)
+```
 
 The scaling constants become:
 
-    K1 = 1 / (aspect*tg(fov/2))
-    K2 = 1 / tg(fov/2)
-    K3 = zFar / (zFar – zNear)
+```
+K1 = 1 / (aspect*tg(fov/2))
+K2 = 1 / tg(fov/2)
+K3 = zFar / (zFar – zNear)
+```
 
 You can use `openfl.utils.PerspectiveMatrix3D`, a simple extension of the
 Matrix3D class to help with this process. It implements a few simple functions

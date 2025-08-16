@@ -203,13 +203,17 @@ Shader simply transforms the vertices according to a transform matrix passed in
 from Haxe, and then passes along the vertex color down the rendering pipeline to
 the Fragment Shader.
 
-    m44 op, va0, vc0
-    mov v0, va1
+```
+m44 op, va0, vc0
+mov v0, va1
+```
 
 The Fragment Shader gets the interpolated color from its input and passes it
 along as output color.
 
-    mov oc, v0
+```
+mov oc, v0
+```
 
 You'll use
 [AGAL Mini Assembler](https://github.com/Gamua/Starling-Framework/blob/master/starling/src/com/adobe/utils/AGALMiniAssembler.as)
@@ -497,8 +501,10 @@ Shader is very similar to the the colored triangle sample project described
 above, except that Attribute Register 1 contains UV coordinates instead of color
 values.
 
-    m44 op, va0, vc0
-    mov v0, va1
+```
+m44 op, va0, vc0
+mov v0, va1
+```
 
 The Fragment Shader receives the interpolated UV coordinates and uses them to
 sample the texture, through a Texture Sampler.
@@ -506,8 +512,10 @@ sample the texture, through a Texture Sampler.
 Let's imagine that the texture is associated to Haxe to Texture Sampler 0. In
 this case, the Fragment Shader will be:
 
-    tex ft1, v0, fs0 <2d>
-    mov oc, ft1
+```
+tex ft1, v0, fs0 <2d>
+mov oc, ft1
+```
 
 The first line of the Fragment Shader samples the texture using Texture Sampler
 0 and the UV coordinates in varying register 0, and copies the result into
@@ -556,13 +564,15 @@ top-right corner.
 The rendering loop then enables the Texture object, and associates it to Texture
 Sampler 0 that is used by the Fragment Shader:
 
-    private function onRender(e:Event):Void
-    {
-        ...
-        // assign texture to texture sampler 0
-        context3D.setTextureAt(0, texture);
-        ...
-    }
+```haxe
+private function onRender(e:Event):Void
+{
+    ...
+    // assign texture to texture sampler 0
+    context3D.setTextureAt(0, texture);
+    ...
+}
+```
 
 After making these changes, run the application again to see the textured
 triangle displayed in the Stage3D app you created (see Figure 3).

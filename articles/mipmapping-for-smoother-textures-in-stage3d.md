@@ -188,31 +188,39 @@ uses linearly filtered mipmapping.
 The following Fragment Shader performs linearly filtered mipmapping with
 bilinear filtering disabled:
 
-    // linearly filtered mip mapping. bilinear filtering disabled
-    tex ft1, v0, fs0 <2d, nearest, miplinear>
-    mov oc, ft1
+```
+// linearly filtered mip mapping. bilinear filtering disabled
+tex ft1, v0, fs0 <2d, nearest, miplinear>
+mov oc, ft1
+```
 
 Here is the version with nearest-neighbour mipmapping using the `mipnearest`
 flag instead:
 
-    // nearest-neighbor mip mapping. bilinear filtering disabled
-    tex ft1, v0, fs0 <2d, nearest, mipnearest>
-    mov oc, ft1
+```
+// nearest-neighbor mip mapping. bilinear filtering disabled
+tex ft1, v0, fs0 <2d, nearest, mipnearest>
+mov oc, ft1
+```
 
 It is also possible to use trilinear filtering by specifying `linear` instead of
 `nearest`:
 
-    // trilinear filtering.
-    tex ft1, v0, fs0 <2d, linear, mipnearest>
-    mov oc, ft1
+```
+// trilinear filtering.
+tex ft1, v0, fs0 <2d, linear, mipnearest>
+mov oc, ft1
+```
 
 If, on the other hand, you don't want mipmapping and just want to go for simple
 bilinear filtering, just use `mipnone` (or `nomip`; they're the same) in place
 of `mipnearest` / `miplinear` and keep the `linear` flag on:
 
-    // bilinear filtering
-    tex ft1, v0, fs0 <2d, linear, mipnone>
-    mov oc, ft1
+```
+// bilinear filtering
+tex ft1, v0, fs0 <2d, linear, mipnone>
+mov oc, ft1
+```
 
 ### A sample mipmapping application
 

@@ -71,9 +71,11 @@ projection transform.
 So, the entire set of transforms applied to a 3D model part of the 3D scene
 looks like this:
 
-    model space -> world space
-    world space -> view space
-    view space -> projection space
+```
+model space -> world space
+world space -> view space
+view space -> projection space
+```
 
 ### Transforming 3D cameras
 
