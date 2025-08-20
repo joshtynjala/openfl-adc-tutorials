@@ -14,19 +14,7 @@ mov v0, va1 // copy color
 </code></pre><p>The second line of the Vertex Shader, copies the vertex color data to Varying Register 0, <code>v0</code>, so that it can get interpolated by the GPU, and passed to the Fragment Shader.</p><p>The Fragment Shader simply copies the Varying Register <code>v0</code> color content to its Output Register oc:</p><pre><code>mov oc, v0
 </code></pre><p>So, this Vertex/Fragment Shader pair just transforms the 3D model vertices using a transform matrix that gets passed in from Haxe, and applies vertex color.</p><p>This is it! Your first Vertex and Fragment Shaders.</p><h3 id="building-a-sample-openfl-app-with-program3d-and-agal-mini-assembler" tabindex="-1">Building a sample OpenFL app with Program3D and AGAL Mini Assembler</h3><p>So, how do you actually fit those bits of AGAL code into a working OpenFL application? This is where the Stage3D API comes in.</p><pre><code class="language-haxe">var program:Program3D = context3D.createProgram();
 </code></pre><p>Before being able to use a <code>Program3D</code> (a shader) for rendering, you first need to upload it to the GPU. You do that by calling the <code>upload</code> method on the <code>Program3D</code> class.</p><pre><code class="language-haxe">public function upload(vertexByteCode:ByteArray, fragmentByteCode:ByteArray):Void;
-```
-
-This method call needs as input the compiled, object code, version of the Vertex
-and Fragment Shaders in order to upload it to the GPU.
-
-A good way to compile AGAL shaders into object code is to use the `openfl.utils.AGALMiniAssember` class: a utility tool that takes as input the Vertex and Fragment Shaders
-source code as strings, and compiles them at runtime into object code.
-
-So, first you are going to use AGAL Mini Assembler to compile the Vertex and
-Fragment Shaders discussed above.
-
-```haxe
-var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+</code></pre><p>This method call needs as input the compiled, object code, version of the Vertex and Fragment Shaders in order to upload it to the GPU.</p><p>A good way to compile AGAL shaders into object code is to use the <code>openfl.utils.AGALMiniAssember</code> class: a utility tool that takes as input the Vertex and Fragment Shaders source code as strings, and compiles them at runtime into object code.</p><p>So, first you are going to use AGAL Mini Assembler to compile the Vertex and Fragment Shaders discussed above.</p><pre><code class="language-haxe">var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
 vertexShaderAssembler.assemble(Context3DProgramType.VERTEX,
     &quot;m44 op, va0, vc0\n&quot; + // pos to clipspace
     &quot;mov v0, va1&quot; // copy color
