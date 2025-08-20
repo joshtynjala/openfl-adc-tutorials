@@ -320,7 +320,7 @@ Before being able to use a `Program3D` (a shader) for rendering, you first need
 to upload it to the GPU. You do that by calling the `upload` method on the
 `Program3D` class.
 
-````haxe
+```haxe
 public function upload(vertexByteCode:ByteArray, fragmentByteCode:ByteArray):Void;
 ```
 
@@ -343,7 +343,7 @@ var fragmentShaderAssembler:AGALMiniAssembler= new AGALMiniAssembler();
 fragmentShaderAssembler.assemble(Context3DProgramType.FRAGMENT,
     "mov oc, v0"
 );
-````
+```
 
 And then upload both Vertex and Fragment Shader programs to the GPU:
 
